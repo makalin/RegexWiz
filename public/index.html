@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RegexWiz</title>
+  <style>
+    body { font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; }
+    h1 { text-align: center; }
+    form { margin-bottom: 20px; }
+    input, button { padding: 8px; margin: 5px; }
+    #result, #testResult { margin-top: 20px; padding: 10px; border: 1px solid #ccc; }
+  </style>
+</head>
+<body>
+  <h1>RegexWiz</h1>
+  <form id="generateForm">
+    <input type="text" id="task" placeholder="Enter task (e.g., match email addresses)" required>
+    <button type="submit">Generate Regex</button>
+  </form>
+  <div id="result"></div>
+  <form id="testForm">
+    <input type="text" id="pattern" placeholder="Enter regex pattern" required>
+    <input type="text" id="sample" placeholder="Enter sample input" required>
+    <button type="submit">Test Regex</button>
+  </form>
+  <div id="testResult"></div>
+  <script>
+    document.getElementById('generateForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const task = document.getElementById('task').value;
+      const response = await fetch('/api/generate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ task })
+      });
+      const data = await response.json();
+      document.getElementById('result').innerHTML = `
+        <h3>Pattern: ${data.pattern}</h3>
+        <h4>Explanation:</h4>
+        <ul>${data.explanation.map(item => `<li>${item}</li>`).join('')}</ul>
+        <h4>Roast: ${data.roast}</h4>
+      `;
+    });
+    document.getElementById('testForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const pattern = document.getElementById('pattern').value;
+      const sample = document.getElementById('sample').value;
+      const response = await fetch('/api/test', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ pattern, sample })
+      });
+      const data = await response.json();
+      document.getElementById('testResult').innerHTML = `
+        <h3>Test Result: ${data.matches ? 'Match!' : 'No match.'}</h3>
+      `;
+    });
+  </script>
+</body>
+</html> 
